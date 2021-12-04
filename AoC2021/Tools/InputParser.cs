@@ -23,5 +23,13 @@ namespace AoC2021.Tools
 
             return dictionary;
         }
+
+        public static Dictionary<int, T> ToDictionary<T>(IEnumerable<T> input)
+        {
+            var dictionary = input.Select((value, index) => new { index, value })
+                      .ToDictionary(pair => pair.index, pair => pair.value);
+
+            return dictionary;
+        }
     }
 }
