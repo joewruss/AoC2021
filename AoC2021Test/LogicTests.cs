@@ -19,7 +19,7 @@ namespace AoC2021Test
         [InlineData(4, 1, "4512")]
         [InlineData(4, 2, "1924")]
         [InlineData(5, 1, "5")]
-        [InlineData(5, 2, "not implemented")]
+        [InlineData(5, 2, "12")]
         [InlineData(6, 1, "not implemented")]
         [InlineData(6, 2, "not implemented")]
         [InlineData(7, 1, "not implemented")]

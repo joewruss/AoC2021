@@ -25,13 +25,12 @@ namespace AoC2021.Day5
 
 
             // loop through segments and draw on the grid
-            foreach(var lineSegment in lineSegments)
+            foreach(var lineSegment in lineSegments.Where(ls => (!ls.IsDiagonal)))
             {
                 lineSegment.Draw(theGrid);
             }
 
-
-            // loop through the grid and get a sum of the increments greater than 1
+            // loop through the grid and get a count of the increments greater than 1
             int totalIntersections = 0;
             for (int x = 0; x <= maxX; x++)
             {
@@ -47,9 +46,45 @@ namespace AoC2021.Day5
             return totalIntersections.ToString();
         }
 
-        public Task<string> RunPart2(string fileName)
+        public async Task<string> RunPart2(string fileName)
         {
-            return Task.FromResult("not implemented");
+            var lineSegments = (await Tools.InputParser.GetInputAsEnumerable<LineSegment>(fileName, (t) => { return new LineSegment(t); })).ToList();
+
+            int maxX = lineSegments.Max(ls => ls.MaxX);
+            int maxY = lineSegments.Max(ls => ls.MaxY);
+
+            // build a grid to hold the counter
+            IntersectionCounter[,] theGrid = new IntersectionCounter[maxX + 1, maxY + 1];
+            for (int x = 0; x <= maxX; x++)
+            {
+                for (int y = 0; y <= maxY; y++)
+                {
+                    theGrid[x, y] = new IntersectionCounter(new Coordinate(x, y));
+                }
+            }
+
+
+            // loop through segments and draw on the grid
+            foreach (var lineSegment in lineSegments)
+            {
+                lineSegment.Draw(theGrid);
+            }
+
+
+            // loop through the grid and get a count of the increments greater than 1
+            int totalIntersections = 0;
+            for (int x = 0; x <= maxX; x++)
+            {
+                for (int y = 0; y <= maxY; y++)
+                {
+                    if (theGrid[x, y].Count > 1)
+                    {
+                        totalIntersections++;
+                    }
+                }
+            }
+
+            return totalIntersections.ToString();
         }
 
         public class LineSegment
@@ -98,34 +133,71 @@ namespace AoC2021.Day5
 
             public int MaxX { get; private set; }
 
-            public int MaxY { get; private set; }
-
-            //public bool ContainsPoint(int x, int y)
-            //{
-            //    if (IsVertical)
-            //    {
-            //        if (coordinateOne.X != x) return false; // not colinear
-            //        if (coordinateOne.Y <= y && y <= coordinateTwo.Y) return true;
-            //    }
-
-            //    if (IsHorizontal)
-            //    {
-            //        if (coordinateOne.Y != y) return false; // not colinear
-            //        if (coordinateOne.X <= x && x <= coordinateTwo.X) return true;
-            //    }
-
-            //    return false; // because we can't say its true
-            //}
+            public int MaxY { get; private set; }            
 
             public bool IsVertical { get; private set; }
             public bool IsHorizontal { get; private set; }
+            public bool IsDiagonal => (!IsVertical && !IsHorizontal);
 
             public void Draw(IntersectionCounter[,] theGrid)
             {
-                if (!IsHorizontal && !IsVertical) return; // don't suport diagonals yet
+                if (!IsHorizontal && !IsVertical)
+                {
+                    // based on the puzzle input stating that all non horizontl and non vertical lines had slopes of either 1 or -1,
+                    // the vertical and horizontal "heights" woudl be identical so you can figure out how may "steps" to make  to cover
+                    // coordinates based on either of the distances
+                    int increments = Math.Abs(coordinateOne.X - coordinateTwo.X);
+                    
+                    if(coordinateOne.X < coordinateTwo.X)
+                    {
+                        if (coordinateOne.Y < coordinateTwo.Y)
+                        {
+                            // coordiate one would be lower than two for both X and Y so you can just 
+                            // increment up
+                            for (int i = 0 ; i <= increments; i++)
+                            {
+                                theGrid[coordinateOne.X + i, coordinateOne.Y + i].Increment();
+                            }
+                        }
+                        else
+                        {
+                            // coordinate one would be lower than two for X but not Y so you must
+                            // increment up for X but down for Y
+                            for (int i = 0; i <= increments; i++)
+                            {
+                                theGrid[coordinateOne.X + i, coordinateOne.Y - i].Increment();
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        if (coordinateOne.Y < coordinateTwo.Y)
+                        {
+                            // coordinate one would be higher than two for X but not Y so you must
+                            // increment down for X but up for Y
+                            for (int i = 0; i <= increments; i++)
+                            {
+                                theGrid[coordinateOne.X - i, coordinateOne.Y + i].Increment();
+                            }
+                        }
+                        else
+                        {
+                            // coordiate one would be higher than two for both X and Y so you can just 
+                            // increment down
+                            for (int i = 0; i <= increments; i++)
+                            {
+                                theGrid[coordinateOne.X - i, coordinateOne.Y - i].Increment();
+                            }
+                        }
+                    }
+                    return;
+                }
+
 
                 // my logic happens to set both the veritical and horizontal to true if this is a point
-                // and not a true line so cover this in case
+                // and not a true line so cover this in case although in checking later are no points
+                // in the input
                 if (IsHorizontal && IsVertical)
                 {
                     theGrid[coordinateOne.X, coordinateOne.Y].Increment();
