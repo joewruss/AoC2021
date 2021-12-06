@@ -14,6 +14,7 @@ namespace AoC2021.Tools
             return guts.Select(t => mapping(t));
         }
 
+
         public async static Task<IDictionary<int, T>> GetInputAsDictionary<T>(string fileName, Func<string, T> mapping)
         {
             var guts = await System.IO.File.ReadAllLinesAsync(fileName);
@@ -52,6 +53,13 @@ namespace AoC2021.Tools
 
             return guts.First().Split(delimiter).Select((value, index) => new { index, value })
                       .ToDictionary(pair => pair.index, pair => mapping(pair.value));
+        }
+
+        public async static Task<IEnumerable<T>> GetFirstLineAsEnumerable<T>(string fileName, string delimiter, Func<string, T> mapping)
+        {
+            var guts = await System.IO.File.ReadAllLinesAsync(fileName);
+
+            return guts.First().Split(delimiter).Select(t => mapping(t));
         }
     }
 }
