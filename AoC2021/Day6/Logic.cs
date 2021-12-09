@@ -33,57 +33,66 @@ namespace AoC2021.Day6
 
         public async Task<string> RunPart2(string fileName)
         {
-            //var school = await Tools.InputParser.GetFirstLineAsEnumerable(fileName, ",", (t) => { return new LanternFish(256, int.Parse(t)); });
+            var school = await Tools.InputParser.GetFirstLineAsEnumerable(fileName, ",", (t) => { return new LanternFish(256, int.Parse(t)); });
 
-            //int schoolSize = 0;
+            long schoolSize = 0;
+
+            List<long> ancestors = new List<long>();
 
             //foreach (var fish in school)
             //{
-            //    schoolSize = schoolSize + 1 + fish.Produces();
-            //}  
+             //   schoolSize = schoolSize // previous initial fish
+               //            + (long)1 // for itself
+                //             + fish.Produces(256 - fish.DaysBeforeReproduction);
+                //ancestors.Add(fish.Produces(256) + new LanternFish(0).Produces(fish.DaysToReproduce - 8));
+                //}  
 
-            //return schoolSize.ToString();
-            Dictionary<string, long> newSchool = new Dictionary<string, long>();
-            newSchool.Add("0", 0);
-            newSchool.Add("1", 0);
-            newSchool.Add("2", 0);
-            newSchool.Add("3", 0);
-            newSchool.Add("4", 0);
-            newSchool.Add("5", 0);
-            newSchool.Add("6", 0);
-            newSchool.Add("7", 0);
-            newSchool.Add("8", 0);
+            schoolSize = new LanternFish(0).Produces(8);
 
-            var initialSchool = await Tools.InputParser.GetFirstLineAsEnumerable(fileName, ",", (t) => { return t; });
-            foreach (var fish in initialSchool)
-            {
-                newSchool[fish]++;
-            }
+            return schoolSize.ToString();
+            
+            
+            //Dictionary<string, long> newSchool = new Dictionary<string, long>();
+            //newSchool.Add("0", 0);
+            //newSchool.Add("1", 0);
+            //newSchool.Add("2", 0);
+            //newSchool.Add("3", 0);
+            //newSchool.Add("4", 0);
+            //newSchool.Add("5", 0);
+            //newSchool.Add("6", 0);
+            //newSchool.Add("7", 0);
+            //newSchool.Add("8", 0);
 
-            for (int i = 0; i < 256; i++)
-            {
-                long newFish = newSchool["0"];
-                newSchool["0"] = newSchool["1"];
-                newSchool["1"] = newSchool["2"];
-                newSchool["2"] = newSchool["3"];
-                newSchool["3"] = newSchool["4"];
-                newSchool["4"] = newSchool["5"];
-                newSchool["5"] = newSchool["6"];
-                newSchool["6"] = newSchool["7"] + newFish;
-                newSchool["7"] = newSchool["8"];
-                newSchool["8"] = newFish;
+            //var initialSchool = await Tools.InputParser.GetFirstLineAsEnumerable(fileName, ",", (t) => { return t; });
+            //foreach (var fish in initialSchool)
+            //{
+            //    newSchool[fish]++;
+            //}
 
-            }
+            //for (int i = 0; i < 256; i++)
+            //{
+            //    long newFish = newSchool["0"];
+            //    newSchool["0"] = newSchool["1"];
+            //    newSchool["1"] = newSchool["2"];
+            //    newSchool["2"] = newSchool["3"];
+            //    newSchool["3"] = newSchool["4"];
+            //    newSchool["4"] = newSchool["5"];
+            //    newSchool["5"] = newSchool["6"];
+            //    newSchool["6"] = newSchool["7"] + newFish;
+            //    newSchool["7"] = newSchool["8"];
+            //    newSchool["8"] = newFish;
 
-            return (newSchool["0"] +
-            newSchool["1"] +
-            newSchool["2"] +
-            newSchool["3"] +
-            newSchool["4"] +
-            newSchool["5"] +
-            newSchool["6"] +
-            newSchool["7"] +
-            newSchool["8"]).ToString();
+            //}
+
+            //return (newSchool["0"] +
+            //newSchool["1"] +
+            //newSchool["2"] +
+            //newSchool["3"] +
+            //newSchool["4"] +
+            //newSchool["5"] +
+            //newSchool["6"] +
+            //newSchool["7"] +
+            //newSchool["8"]).ToString();
         }
     }
 
@@ -112,16 +121,18 @@ namespace AoC2021.Day6
             Age--;
         }
 
-        //public int Produces()
-        //{
-        //    if (DaysToReproduce - DaysBeforeReproduction >= 0) return 0;
-            
-        //    if (DaysBeforeReproduction >
+        public long Produces(int daysToReproduce)
+        {
+            if (daysToReproduce < 6) return 0;
 
-        //    //return (givenDays / 6) * new LanternFish(givenDays - 8).Produces(givenDays - 6);
+            long a = (long)Math.Floor((decimal)(daysToReproduce / 6));
+            long b = new LanternFish(0).Produces(daysToReproduce - 8);
 
-        //    return 0;
-        //}
+            return a + b;
+
+            //return (long)Math.Floor((decimal)(daysToReproduce / 6))
+            //    + new LanternFish(0).Produces(daysToReproduce - 8);
+        }
 
         public int Grow(int forDays)
         {
