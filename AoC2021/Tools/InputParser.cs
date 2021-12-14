@@ -14,6 +14,28 @@ namespace AoC2021.Tools
             return guts.Select(t => mapping(t));
         }
 
+        public async static Task<int[,]> GetInputAsIntMap(string fileName)
+        {
+            var guts = await System.IO.File.ReadAllLinesAsync(fileName);
+            
+            int[,] map = new int[guts[0].Length, guts.Length];
+
+            int x = 0;
+            int y = 0;
+            foreach (var row in guts)
+            {
+                foreach (var col in row.ToArray())
+                {                    
+                    map[x, y] = int.Parse(col.ToString());
+                    x++;
+                }
+                y++;
+                x = 0;
+            }
+
+            return map;
+        }
+
 
         public async static Task<IDictionary<int, T>> GetInputAsDictionary<T>(string fileName, Func<string, T> mapping)
         {
